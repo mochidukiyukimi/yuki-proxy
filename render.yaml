@@ -2,5 +2,7 @@ services:
   - type: web
     name: incognito
     env: node
+    region: Oregon
+    plan: free
     buildCommand: npm install
     startCommand: npm start
