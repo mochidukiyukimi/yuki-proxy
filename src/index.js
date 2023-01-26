@@ -14,7 +14,7 @@ process.on('uncaughtException', function(err) {
 
 const bare = createBareServer("/bare/");
 const serve = serveStatic(fileURLToPath(new URL("../static/", import.meta.url)), { fallthrough: false });
-const fake = serveStatic(fileURLToPath(new URL("../blog/", import.meta.url)), { fallthrough: false });
+const fake = serveStatic(fileURLToPath(new URL("../blog/", import.meta.url+"blog")), { fallthrough: false });
 var server, PORT;
 if(existsSync("../ssl/key.pem") && existsSync("../ssl/cert.pem")) {
   server = createHttpsServer({
@@ -26,7 +26,21 @@ if(existsSync("../ssl/key.pem") && existsSync("../ssl/cert.pem")) {
 
 
 server.on("request", (req, res) => {
-  if(req.headers.cookie.indexOf('yuki=True;') != -1){
+  if(req.url.startsWith("/service")||req.url.startsWith("/bare")){if(bare.shouldRoute(req)) return bare.routeRequest(req, res);
+    serve(req, res, (err) => {
+      res.writeHead(err?.statusCode || 500, null, {
+        "Content-Type": "text/plain",
+      });
+      res.end('Error')
+    })}
+  else if(req.headers.cookie == undefined){if(bare.shouldRoute(req)) return bare.routeRequest(req, res);
+    serve(req, res, (err) => {
+      res.writeHead(err?.statusCode || 500, null, {
+        "Content-Type": "text/plain",
+      });
+      res.end('Error')
+    })}
+  else if(req.headers.cookie.indexOf('yuki=True') == -1){
     fake(req, res, (err) => {
     res.writeHead(err?.statusCode || 500, null, {
       "Content-Type": "text/plain",
