@@ -33,13 +33,11 @@ server.on("request", (req, res) => {
       });
       res.end('Error')
     })}
-  else if(req.headers.cookie == undefined){if(bare.shouldRoute(req)) return bare.routeRequest(req, res);
-    serve(req, res, (err) => {
-      res.writeHead(err?.statusCode || 500, null, {
-        "Content-Type": "text/plain",
-      });
-      res.end('Error')
-    })}
+  else if(req.headers.cookie == undefined){fake(req, res, (err) => {
+    res.writeHead(err?.statusCode || 500, null, {
+      "Content-Type": "text/plain",
+    });
+    res.end('Error');})}
   else if(req.headers.cookie.indexOf('yuki=True') == -1){
     fake(req, res, (err) => {
     res.writeHead(err?.statusCode || 500, null, {
