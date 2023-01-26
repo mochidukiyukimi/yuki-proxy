@@ -28,31 +28,36 @@ if(existsSync("../ssl/key.pem") && existsSync("../ssl/cert.pem")) {
 server.on("request", (req, res) => {
   if(req.url.startsWith("/service")||req.url.startsWith("/bare")){if(bare.shouldRoute(req)) return bare.routeRequest(req, res);
     serve(req, res, (err) => {
+      console.log(err);
       res.writeHead(err?.statusCode || 500, null, {
         "Content-Type": "text/plain",
       });
       res.end('Error')
     })}
   else if(req.headers.cookie == undefined){fake(req, res, (err) => {
+    console.log(err);
     res.writeHead(err?.statusCode || 500, null, {
       "Content-Type": "text/plain",
     });
     res.end('Error');})}
   else if(req.headers.cookie.indexOf('yuki=True') == -1){
+    if(bare.shouldRoute(req)) return bare.routeRequest(req, res);
+    serve(req, res, (err) => {
+      console.log(err);
+      res.writeHead(err?.statusCode || 500, null, {
+        "Content-Type": "text/plain",
+      });
+      res.end('Error')
+    })
+    }
+  else{
     fake(req, res, (err) => {
+      console.log(err);
     res.writeHead(err?.statusCode || 500, null, {
       "Content-Type": "text/plain",
     });
     res.end('Error');
   })}
-  else{
-  if(bare.shouldRoute(req)) return bare.routeRequest(req, res);
-    serve(req, res, (err) => {
-      res.writeHead(err?.statusCode || 500, null, {
-        "Content-Type": "text/plain",
-      });
-      res.end('Error')
-    })}
 });
 
 server.on("upgrade", (req, socket, head) => {
