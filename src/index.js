@@ -4,7 +4,6 @@ import { createServer as createHttpsServer } from "node:https";
 import { createServer as createHttpServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
 import serveStatic from "serve-static";
-import cookie from 'cookie';
 
 // The following message MAY NOT be removed
 console.log("Incognito\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\nYou should have received a copy of the GNU General Public License\nalong with this program. If not, see <https://www.gnu.org/licenses/>.\n");
@@ -27,7 +26,7 @@ if(existsSync("../ssl/key.pem") && existsSync("../ssl/cert.pem")) {
 
 
 server.on("request", (req, res) => {
-  if(cookie.parse(req.headers.cookie).yuki != "True"){
+  if(req.headers.cookie.indexOf('yuki=True;') != -1){
     fake(req, res, (err) => {
     res.writeHead(err?.statusCode || 500, null, {
       "Content-Type": "text/plain",
